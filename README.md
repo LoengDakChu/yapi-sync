@@ -15,6 +15,62 @@
 | 增量文档 | 修改过的接口，自动从 YApi 拉旧定义做 JSON Schema diff，只输出**新增/变更字段** |
 | 中文友好 | 启动器内置 UTF-8 环境，Windows/macOS/Linux 下输出均不乱码 |
 
+## 前置条件
+
+**使用前请先确认以下环境，缺一不可。** 前三项装一次即可，第四项是每个项目单独配。
+
+### 1. Python 3.7+
+
+脚本是 Python 写的，**必须安装 Python**（Python 3.7 及以上版本）。
+
+```bash
+# 检查是否已安装
+python --version      # Windows / Git Bash
+python3 --version     # macOS / Linux
+```
+
+若提示「找不到命令」，请先安装：
+
+- **Windows**：到 [python.org](https://www.python.org/downloads/) 下载安装包，安装时**务必勾选 `Add python.exe to PATH`**
+- **macOS**：`brew install python`（或到官网下载）
+- **Linux**：`sudo apt install python3 python3-pip`（Debian/Ubuntu）或 `sudo yum install python3`（CentOS）
+
+### 2. pip 与依赖包
+
+安装 Python 时通常自带 `pip`，用它装两个依赖：`requests`、`PyYAML`。
+
+```bash
+pip install -r requirements.txt
+```
+
+> 若 `pip` 不可用，先执行 `python -m ensurepip --upgrade`。
+> 若提示权限错误，改用 `pip install --user -r requirements.txt`。
+> 国内网络慢可加镜像：`pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple`
+
+### 3. git
+
+脚本靠 `git diff` 识别本次改了哪些 Controller，**目标项目必须是 git 仓库**。
+
+```bash
+git --version
+```
+
+未安装请到 [git-scm.com](https://git-scm.com/downloads) 下载。
+
+### 4. YApi 配置（每个项目都要配）
+
+你的 Java 项目根目录需要 `.easy.api.yml`，里面填 YApi 服务地址和各模块 token。具体见下方「[项目配置](#项目配置)」一节。
+
+### 环境自检
+
+装完后执行下面这条，能正常打印版本号就说明环境没问题：
+
+```bash
+python --version && pip show requests PyYAML && git --version
+```
+
+> 三项都输出信息即就绪。若某一项报错，脚本运行时也会给出中文提示。
+
 ## 适用条件
 
 满足以下条件即可使用，**不需要 Swagger 注解**：
@@ -22,7 +78,7 @@
 - Java Spring Boot 多模块项目（Gradle / Maven 均可）
 - Controller 用 `@RestController` + `@RequestMapping` + `@GetMapping`/`@PostMapping` 等注解
 - 项目根目录有 `.easy.api.yml`（YApi 服务地址 + 各模块 token）
-- 本机有 Python 3.7+（脚本依赖 `requests`、`PyYAML`）
+- 本机满足上方「前置条件」
 
 ## 安装
 
@@ -50,6 +106,7 @@ pip install -r ~/.claude/skills/yapi-sync/requirements.txt
 ```
 
 > 依赖只有 `requests`、`PyYAML` 两个。若缺失，脚本会直接给出中文提示而非一堆 traceback。
+> 还没装 Python？请先看上方「[前置条件](#前置条件)」。
 
 ### 其它 agent
 
@@ -181,6 +238,26 @@ yapi-sync/
 3. **先 dry-run 再同步**：同步会真实写入 YApi，建议先预览确认。
 4. **生成文档需要真实同步**：文档中的 YApi 链接依赖接口 ID，`--dry-run` 模式不会生成文档。
 5. **大项目分页**：脚本会自动翻页拉取 YApi 全部接口（几百个也没问题）。
+
+## 常见问题
+
+**Q：报 `Config file not found: ...\.easy.api.yml`**
+A：还没配项目配置。复制 `.easy.api.yml.example` 到你的业务项目根目录，改名 `.easy.api.yml` 并填好 server 和 token。
+
+**Q：报「缺少依赖」，让我 `pip install -r requirements.txt`**
+A：Python 依赖没装或装到了别的 Python 环境。用 `pip show requests PyYAML` 确认，注意 `python` 和 `pip` 要指向同一个解释器。
+
+**Q：`sync.sh: Permission denied`（macOS / Linux）**
+A：首次使用给脚本加执行权限：`chmod +x ~/.claude/skills/yapi-sync/scripts/sync.sh`。
+
+**Q：Windows 下输出中文乱码**
+A：不要直接用 `python yapi_sync.py`，改用 `sync.bat`（已自动 `chcp 65001` 并设置 `PYTHONUTF8=1`）。
+
+**Q：提示 `No changed Controller files found`**
+A：没有检测到 Controller 变更。确认改动位于 `controller/web/` 或 `controller/mobile/` 下、文件以 `Controller.java` 结尾，且确实有未提交改动；想看某分支的全部改动用 `--base=master`。
+
+**Q：提示 `No YApi token for module: xxx`**
+A：`.easy.api.yml` 里缺少该模块的 token，或 key 的最后模块名不以 `-service` 结尾导致识别不到。
 
 ## 许可证
 
