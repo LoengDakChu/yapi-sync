@@ -1,0 +1,4 @@
+# 统一使用 LF 换行，避免 Windows/Linux 换行符差异导致脚本执行异常
+* text=auto eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf

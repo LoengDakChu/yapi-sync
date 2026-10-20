@@ -1,0 +1,14 @@
+# ============================================================
+# 复制本文件到「你的项目根目录」，改名为 .easy.api.yml 并填真实值。
+# 注意：.easy.api.yml 包含 YApi token，属于敏感信息，切勿提交到 git。
+# ============================================================
+
+yapi:
+  # YApi 服务地址，不要带末尾斜杠
+  server: http://your-yapi-server.example.com
+
+  token:
+    # key 格式：micro-services.<模块名>.main
+    # 模块名 = 项目里以 -service 结尾的 Gradle 子模块目录名
+    micro-services.member-service.main: "在这里填 member-service 的 YApi token"
+    micro-services.order-service.main: "在这里填 order-service 的 YApi token"
