@@ -9,7 +9,7 @@ license: MIT
 metadata:
   author: WorkBuddy
   keywords: [yapi, sync, java, spring-boot, api-doc, frontend]
-  version: 1.1.0
+  version: 0.1.0
 ---
 
 # YApi 接口同步 + 前端对接文档
